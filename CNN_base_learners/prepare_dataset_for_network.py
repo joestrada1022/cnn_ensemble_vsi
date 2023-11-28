@@ -10,20 +10,33 @@ class DataSetGeneratorForBranchCNN:
 
         self.train_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, "train"))
         self.test_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, f"test{test_dir_suffix}"))
+        self.val_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, f"val"))
         
         self.device_types = np.array([item.name for item in self.train_dir_patchs.glob('*') if not item.name.startswith('.')])
         self.train_image_count = len(list(self.train_dir_patchs.glob('*/*.jpg')))
         self.test_image_count = len(list(self.test_dir_patchs.glob('*/*.jpg')))
+        self.val_image_count = len(list(self.val_dir_patchs.glob('*/*.jpg')))
 
         self.class_names = self.get_classes(classes)
         print(self.class_names)
+
+        self.exclude_devices = [
+            "HuaweiY7",
+            "HuaweiY9"
+        ]
 
     def get_classes(self, classes):
         if classes is not None:
             return classes
         else:
             class_names = sorted(self.train_dir_patchs.glob("*"))
-            return np.array([x.name for x in class_names if not x.name.startswith('.')])            
+            all_classes = np.array([x.name for x in class_names if not x.name.startswith('.')])    
+            final_classes = []
+            for c in all_classes:
+                if "Device2" not in c and "Device4" not in c and  "Device6" not in c and "Device8" not in c and  "Device10" not in c and "Device12" not in c and  "Device14" not in c and "Device16" not in c and  "Device18" not in c and "Device20" not in c:
+                # if "HuaweiY7" not in c and "HuaweiY9" not in c:
+                    final_classes.append(c)
+            return np.array(final_classes)  
 
     def get_class_names(self):
         return self.class_names
@@ -53,10 +66,16 @@ class DataSetGeneratorForBranchCNN:
     def create_train_dataset(self):
 
         train_input_patchs_file_names = np.array(glob(str(self.train_dir_patchs) + "/**/*.jpg", recursive = True))
+        train_input_patchs_file_names_temp = []
+        for file in train_input_patchs_file_names:
+            if "Device2" not in file and "Device4" not in file and  "Device6" not in file and "Device8" not in file and  "Device10" not in file and "Device12" not in file and  "Device14" not in file and "Device16" not in file and  "Device18" not in file and "Device20" not in file:
+                train_input_patchs_file_names_temp.append(file)
+        train_input_patchs_file_names_final = np.array(train_input_patchs_file_names_temp)
+
         labeled_dictionary = list()
-        random.shuffle(train_input_patchs_file_names)
-        
-        for i, file_path in enumerate(train_input_patchs_file_names):
+        random.shuffle(train_input_patchs_file_names_final)
+
+        for i, file_path in enumerate(train_input_patchs_file_names_final):
             class_label = self.determine_label(file_path)
             ds_row = {"item_ID": i, "patch_path": file_path, "class_label": class_label}                        
             labeled_dictionary.append(ds_row)
@@ -65,12 +84,19 @@ class DataSetGeneratorForBranchCNN:
 
     def create_validation_dataset(self):
 
-        validation_input_patchs_file_names = np.array(glob(str(self.test_dir_patchs) + "/**/*.jpg", recursive = True))
+        validation_input_patchs_file_names = np.array(glob(str(self.val_dir_patchs) + "/**/*.jpg", recursive = True))
+
+        validation_input_patchs_file_names_temp = []
+        for file in validation_input_patchs_file_names:
+            if "Device2" not in file and "Device4" not in file and  "Device6" not in file and "Device8" not in file and  "Device10" not in file and "Device12" not in file and  "Device14" not in file and "Device16" not in file and  "Device18" not in file and "Device20" not in file:
+                validation_input_patchs_file_names_temp.append(file)
+        validation_input_patchs_file_names_final = np.array(validation_input_patchs_file_names_temp)
+        
         labeled_dictionary = list()
 
-        random.shuffle(validation_input_patchs_file_names)
+        random.shuffle(validation_input_patchs_file_names_final)
 
-        for i, file_path in enumerate(validation_input_patchs_file_names):
+        for i, file_path in enumerate(validation_input_patchs_file_names_final):
             class_label = self.determine_label(file_path)
             ds_row = {"item_ID": i, "patch_path": file_path, "class_label": class_label}
             labeled_dictionary.append(ds_row)
@@ -79,12 +105,19 @@ class DataSetGeneratorForBranchCNN:
 
     def create_test_dataset(self):
 
-        validation_input_patchs_file_names = np.array(glob(str(self.test_dir_patchs) + "/**/*.jpg", recursive = True))
+        test_input_patchs_file_names = np.array(glob(str(self.test_dir_patchs) + "/**/*.jpg", recursive = True))
+
+        test_input_patchs_file_names_temp = []
+        for file in test_input_patchs_file_names:
+            if "Device2" not in file and "Device4" not in file and  "Device6" not in file and "Device8" not in file and  "Device10" not in file and "Device12" not in file and  "Device14" not in file and "Device16" not in file and  "Device18" not in file and "Device20" not in file:
+                test_input_patchs_file_names_temp.append(file)
+        test_input_patchs_file_names_final = np.array(test_input_patchs_file_names_temp)
+
         labeled_dictionary = list()
 
-        random.shuffle(validation_input_patchs_file_names)
+        random.shuffle(test_input_patchs_file_names_final)
 
-        for i, file_path in enumerate(validation_input_patchs_file_names):
+        for i, file_path in enumerate(test_input_patchs_file_names_final):
             class_label = self.determine_label(file_path)
             ds_row = {"item_ID": i, "patch_path": file_path, "class_label": class_label}
             labeled_dictionary.append(ds_row)
