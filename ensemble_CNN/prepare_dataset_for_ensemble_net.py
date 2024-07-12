@@ -22,14 +22,11 @@ class DataSetGeneratorForEnsembleModel:
         if classes is not None:
             return classes
         else:
-            # class_names = sorted(self.train_dir_patchs.glob("*"))
-            # return np.array([x.name for x in class_names if not x.name.startswith('.')])   
             class_names = sorted(self.train_dir_patchs.glob("*"))
             all_classes = np.array([x.name for x in class_names if not x.name.startswith('.')])    
             final_classes = []
             for c in all_classes:
                 if "Device2" not in c and "Device4" not in c and  "Device6" not in c and "Device8" not in c and  "Device10" not in c and "Device12" not in c and  "Device14" not in c and "Device16" not in c and  "Device18" not in c and "Device20" not in c:
-                # if "HuaweiY7" not in c and "HuaweiY9" not in c:
                     final_classes.append(c)
             return np.array(final_classes)          
 
@@ -58,48 +55,6 @@ class DataSetGeneratorForEnsembleModel:
                 label[i] = 1
         return label
 
-    # def normalize_quadrants_selection(self, quadrant1_patches, quadrant2_patches, quadrant3_patches, quadrant4_patches):
-    #     final_patches_quadrant_2 = list()
-    #     final_patches_quadrant_3 = list()
-    #     final_patches_quadrant_4 = list()
-
-    #     final_paths_dict = list()
-        
-    #     for path in quadrant1_patches:
-    #         quadrant2_path = ""
-    #         quadrant3_path = ""
-    #         quadrant4_path = ""
-    #         file_path, file_name = os.path.split(path)
-    #         _, corrected_name = file_name.split("frame")
-    #         frame_number, video_name = corrected_name.split("_vid_name_")
-    #         classes = self.get_class_names()
-    #         for device in classes:
-    #             if device in file_path:
-    #                 device_path_name = device
-    #                 break
-    #         for path2 in quadrant2_patches:
-    #             if video_name in path2 and frame_number in path2 and device_path_name in path2 and path2 not in final_patches_quadrant_2:
-    #                 quadrant2_path = path2
-    #                 break
-    #         for path3 in quadrant3_patches:
-    #             if video_name in path3 and frame_number in path3 and device_path_name in path3 and path3 not in final_patches_quadrant_3:
-    #                 quadrant3_path = path3
-    #                 break
-    #         for path4 in quadrant4_patches:
-    #             if video_name in path4 and frame_number in path4 and device_path_name in path4 and path4 not in final_patches_quadrant_4:
-    #                 quadrant4_path = path4
-    #                 break
-            
-    #         if len(quadrant2_path) < 1 or len(quadrant3_path) < 1 or len(quadrant4_path) < 1:
-    #             continue
-    #         final_patches_quadrant_2.append(quadrant2_path)
-    #         final_patches_quadrant_3.append(quadrant3_path)
-    #         final_patches_quadrant_4.append(quadrant4_path)
-    #         class_label = self.determine_label(path)
-    #         addValue = {"quadrant_1_patch":path, "quadrant_2_patch": quadrant2_path, 
-    #             "quadrant_3_patch":quadrant3_path, "quadrant_4_patch": quadrant4_path, "class_label": class_label}
-    #         final_paths_dict.append(addValue)
-    #     return final_paths_dict
 
 
     def normalize_quadrants_selection_new(self, quadrant1_patches, quadrant2_patches, quadrant3_patches, quadrant4_patches):
@@ -120,8 +75,6 @@ class DataSetGeneratorForEnsembleModel:
 
 
 
-            # _, corrected_name = file_name.split("frame")
-            # frame_number, video_name = corrected_name.split("_vid_name_")
             classes = self.get_class_names()
             for device in classes:
                 if device in file_path:

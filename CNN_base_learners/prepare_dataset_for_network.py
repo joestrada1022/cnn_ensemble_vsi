@@ -20,10 +20,6 @@ class DataSetGeneratorForBranchCNN:
         self.class_names = self.get_classes(classes)
         print(self.class_names)
 
-        self.exclude_devices = [
-            "HuaweiY7",
-            "HuaweiY9"
-        ]
 
     def get_classes(self, classes):
         if classes is not None:
@@ -34,7 +30,6 @@ class DataSetGeneratorForBranchCNN:
             final_classes = []
             for c in all_classes:
                 if "Device2" not in c and "Device4" not in c and  "Device6" not in c and "Device8" not in c and  "Device10" not in c and "Device12" not in c and  "Device14" not in c and "Device16" not in c and  "Device18" not in c and "Device20" not in c:
-                # if "HuaweiY7" not in c and "HuaweiY9" not in c:
                     final_classes.append(c)
             return np.array(final_classes)  
 
