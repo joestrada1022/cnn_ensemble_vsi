@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from tensorflow.keras.utils import Sequence
+from keras.utils import Sequence
 
 class DataGeneratorCNNBranch(Sequence):
     def __init__(self,frames_path_dict, num_classes, batch_size=32, to_fit=True, shuffle=True):
