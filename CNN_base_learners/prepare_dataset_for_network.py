@@ -1,25 +1,34 @@
 import numpy as np
-import pathlib, csv
+import csv
 import os, random
+from pathlib import Path
 from glob import glob
 
-
 class DataSetGeneratorForBranchCNN:
-    def __init__(self, input_dir_patchs=None, test_dir_suffix="", classes=None): 
-        self.data_dir_patchs = pathlib.Path(input_dir_patchs)
-
-        self.train_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, "train"))
-        self.test_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, f"test{test_dir_suffix}"))
-        self.val_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, f"val"))
+    def __init__(self, input_dir_patchs=None, test_dir_suffix="", quadrant="", classes=None): 
+        self.data_dir_patchs = Path(input_dir_patchs)
+        self.train_dir_patchs = Path(os.path.join(self.data_dir_patchs, "Training"))
+        self.test_dir_patchs = Path(os.path.join(self.data_dir_patchs, "Testing"))
+        self.val_dir_patchs = Path(os.path.join(self.data_dir_patchs, "Validation"))
+        self.quadrant = quadrant
         
         self.device_types = np.array([item.name for item in self.train_dir_patchs.glob('*') if not item.name.startswith('.')])
-        self.train_image_count = len(list(self.train_dir_patchs.glob('*/*.jpg')))
-        self.test_image_count = len(list(self.test_dir_patchs.glob('*/*.jpg')))
-        self.val_image_count = len(list(self.val_dir_patchs.glob('*/*.jpg')))
+        # self.train_dir_patchs = Path(os.path.join(self.train_dir_patchs, quadrant))
+        # self.test_dir_patchs = Path(os.path.join(self.test_dir_patchs, quadrant))
+        # self.val_dir_patchs = Path(os.path.join(self.val_dir_patchs, quadrant))
+
+
+        self.train_image_count = len(list(self.train_dir_patchs.glob(f'**/{self.quadrant}/**/*.jpg')))
+        self.test_image_count = len(list(self.test_dir_patchs.glob(f'**/{self.quadrant}/**/*.jpg')))
+        self.val_image_count = len(list(self.val_dir_patchs.glob(f'**/{self.quadrant}/**/*.jpg')))
 
         self.class_names = self.get_classes(classes)
         print(self.class_names)
 
+        self.exclude_devices = [
+            # "HuaweiY7",
+            # "HuaweiY9"
+        ]
 
     def get_classes(self, classes):
         if classes is not None:
@@ -30,6 +39,7 @@ class DataSetGeneratorForBranchCNN:
             final_classes = []
             for c in all_classes:
                 if "Device2" not in c and "Device4" not in c and  "Device6" not in c and "Device8" not in c and  "Device10" not in c and "Device12" not in c and  "Device14" not in c and "Device16" not in c and  "Device18" not in c and "Device20" not in c:
+                # if "HuaweiY7" not in c and "HuaweiY9" not in c:
                     final_classes.append(c)
             return np.array(final_classes)  
 
@@ -60,7 +70,8 @@ class DataSetGeneratorForBranchCNN:
     
     def create_train_dataset(self):
 
-        train_input_patchs_file_names = np.array(glob(str(self.train_dir_patchs) + "/**/*.jpg", recursive = True))
+        train_input_patchs_file_names = np.array(glob(str(self.train_dir_patchs) + f"/**/{self.quadrant}/**/*.jpg", recursive = True))
+        # print(train_input_patchs_file_names[:5])
         train_input_patchs_file_names_temp = []
         for file in train_input_patchs_file_names:
             if "Device2" not in file and "Device4" not in file and  "Device6" not in file and "Device8" not in file and  "Device10" not in file and "Device12" not in file and  "Device14" not in file and "Device16" not in file and  "Device18" not in file and "Device20" not in file:
@@ -79,7 +90,7 @@ class DataSetGeneratorForBranchCNN:
 
     def create_validation_dataset(self):
 
-        validation_input_patchs_file_names = np.array(glob(str(self.val_dir_patchs) + "/**/*.jpg", recursive = True))
+        validation_input_patchs_file_names = np.array(glob(str(self.val_dir_patchs) + f"/**/{self.quadrant}/**/*.jpg", recursive = True))
 
         validation_input_patchs_file_names_temp = []
         for file in validation_input_patchs_file_names:
@@ -100,7 +111,7 @@ class DataSetGeneratorForBranchCNN:
 
     def create_test_dataset(self):
 
-        test_input_patchs_file_names = np.array(glob(str(self.test_dir_patchs) + "/**/*.jpg", recursive = True))
+        test_input_patchs_file_names = np.array(glob(str(self.test_dir_patchs) + f"/**/{self.quadrant}/**/*.jpg", recursive = True))
 
         test_input_patchs_file_names_temp = []
         for file in test_input_patchs_file_names:

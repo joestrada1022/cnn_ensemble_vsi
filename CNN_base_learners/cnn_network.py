@@ -1,8 +1,8 @@
 import os
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Input, Activation, Flatten, Conv2D, MaxPooling2D, BatchNormalization
-from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import TensorBoard, Callback
+from keras.layers import Dense, Input, Activation, Flatten, Conv2D, MaxPooling2D, BatchNormalization
+from keras.models import Model
+from keras.callbacks import TensorBoard, Callback
 from keras import backend as K
 from keras.constraints import Constraint
 import numpy as np
@@ -127,12 +127,12 @@ class BranchCNNModel:
         callbacks = self.get_callbacks()
         
         self.model.fit(DataGeneratorCNNBranch(train_ds, num_classes=num_classes, batch_size=32),
-                       epochs=50,
+                       epochs=25,
                        initial_epoch=0,
                        validation_data=DataGeneratorCNNBranch(val_ds_test, num_classes=num_classes, batch_size=32, shuffle=False),
                        callbacks=callbacks,
-                       workers=12,
-                       use_multiprocessing=True)
+                    #    workers=num_cpus
+                       )
 
     def get_tensorboard_path(self):
         if self.model_name is None:
@@ -176,7 +176,7 @@ class BranchCNNModel:
         return os.path.join(path, file_name)
         
     def get_callbacks(self):
-        default_file_name = "fm-e{epoch:05d}.h5"
+        default_file_name = "fm-e{epoch:05d}.keras"
         save_model_path_acc = self.get_save_model_path_acc(default_file_name)
         save_model_path_loss = self.get_save_model_path_loss(default_file_name)
 
@@ -198,7 +198,7 @@ class BranchCNNModel:
         tensorboard_cb = TensorBoard(log_dir=self.get_tensorboard_path())
         # print_lr_cb = PrintLearningRate()
 
-        return [save_model_acc, save_model_val]
+        return [save_model_acc, save_model_val, tensorboard_cb]
 
 class PrintLearningRate(Callback):
     def on_epoch_end(self, epoch, logs=None):

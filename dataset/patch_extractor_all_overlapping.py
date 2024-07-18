@@ -95,71 +95,72 @@ def main(source_data_dir, destination_patches_top_rigth, destination_patches_bot
     t_start = time.time()
     # print(devices)
     for device in devices:
-        if "iPhoneXsMaxDevice7" in str(device):
-            image_paths = device.glob("*")
-            destination_device_dir_pathches_top_rigth = destination_patches_top_rigth.joinpath(device.name)
-            destination_device_dir_pathches_bottom_rigth = destination_patches_bottom_rigth.joinpath(device.name)
-            destination_device_dir_pathches_top_left = destination_patches_top_left.joinpath(device.name)
-            destination_device_dir_pathches_bottom_left = destination_patches_bottom_left.joinpath(device.name)
+        device_str = str(device)
+        
+        image_paths = device.glob("*")
+        destination_device_dir_pathches_top_rigth = destination_patches_top_rigth.joinpath(device.name)
+        destination_device_dir_pathches_bottom_rigth = destination_patches_bottom_rigth.joinpath(device.name)
+        destination_device_dir_pathches_top_left = destination_patches_top_left.joinpath(device.name)
+        destination_device_dir_pathches_bottom_left = destination_patches_bottom_left.joinpath(device.name)
 
-            # The following if-else construct makes sense on running multiple instances of this method
-            if destination_device_dir_pathches_top_rigth.exists():
-                continue
-            else:
-                os.makedirs(str(destination_device_dir_pathches_top_rigth), exist_ok=True)
-            if destination_device_dir_pathches_bottom_rigth.exists():
-                continue
-            else:
-                os.makedirs(str(destination_device_dir_pathches_bottom_rigth), exist_ok=True)
-            if destination_device_dir_pathches_top_left.exists():
-                continue
-            else:
-                os.makedirs(str(destination_device_dir_pathches_top_left), exist_ok=True)
-            if destination_device_dir_pathches_bottom_left.exists():
-                continue
-            else:
-                os.makedirs(str(destination_device_dir_pathches_bottom_left), exist_ok=True)    
+        # The following if-else construct makes sense on running multiple instances of this method
+        if destination_device_dir_pathches_top_rigth.exists():
+            continue
+        else:
+            os.makedirs(str(destination_device_dir_pathches_top_rigth), exist_ok=True)
+        if destination_device_dir_pathches_bottom_rigth.exists():
+            continue
+        else:
+            os.makedirs(str(destination_device_dir_pathches_bottom_rigth), exist_ok=True)
+        if destination_device_dir_pathches_top_left.exists():
+            continue
+        else:
+            os.makedirs(str(destination_device_dir_pathches_top_left), exist_ok=True)
+        if destination_device_dir_pathches_bottom_left.exists():
+            continue
+        else:
+            os.makedirs(str(destination_device_dir_pathches_bottom_left), exist_ok=True)    
 
-            num_patches_top_right = 0
-            num_patches_bottom_right = 0
-            num_patches_top_left = 0
-            num_patches_bottom_left = 0
-            # print(destination_device_dir_pathches_top_rigth)
+        num_patches_top_right = 0
+        num_patches_bottom_right = 0
+        num_patches_top_left = 0
+        num_patches_bottom_left = 0
+        # print(destination_device_dir_pathches_top_rigth)
+        
+        for image_path in image_paths:
+            # For now, we only want to extract frames from original videos
+            # if "WA" in image_path.stem or "YT" in image_path.stem:
+            #     continue
+            if ".DS_Store" not in str(image_path):
             
-            for image_path in image_paths:
-                # For now, we only want to extract frames from original videos
-                # if "WA" in image_path.stem or "YT" in image_path.stem:
-                #     continue
-                if ".DS_Store" not in str(image_path):
+                img = cv2.imread(str(image_path))
+                img = np.float32(img) / 255.0
+
+                quadrant_1, quadrant2, quadrant3, quadrant4 = crop_image_into_four_quadrants(img)
                 
-                    img = cv2.imread(str(image_path))
-                    img = np.float32(img) / 255.0
+                pathes_1st_quadrant = get_patches(img_data=quadrant_1, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
+                pathes_2nd_quadrant = get_patches(img_data=quadrant2, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
+                pathes_3rd_quadrant = get_patches(img_data=quadrant3, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
+                pathes_4th_quadrant = get_patches(img_data=quadrant4, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
 
-                    quadrant_1, quadrant2, quadrant3, quadrant4 = crop_image_into_four_quadrants(img)
-                    
-                    pathes_1st_quadrant = get_patches(img_data=quadrant_1, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
-                    pathes_2nd_quadrant = get_patches(img_data=quadrant2, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
-                    pathes_3rd_quadrant = get_patches(img_data=quadrant3, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
-                    pathes_4th_quadrant = get_patches(img_data=quadrant4, std_threshold=np.array([0.02, 0.02, 0.02]), max_num_patches=15)
+                num_patches_top_right += len(pathes_1st_quadrant)
+                num_patches_bottom_right += len(pathes_2nd_quadrant)
+                num_patches_top_left += len(pathes_3rd_quadrant)
+                num_patches_bottom_left += len(pathes_4th_quadrant)
 
-                    num_patches_top_right += len(pathes_1st_quadrant)
-                    num_patches_bottom_right += len(pathes_2nd_quadrant)
-                    num_patches_top_left += len(pathes_3rd_quadrant)
-                    num_patches_bottom_left += len(pathes_4th_quadrant)
+                save_patches(pathes_1st_quadrant, image_path, destination_device_dir_pathches_top_rigth)
+                save_patches(pathes_2nd_quadrant, image_path, destination_device_dir_pathches_bottom_rigth)
+                save_patches(pathes_3rd_quadrant, image_path, destination_device_dir_pathches_top_left)
+                save_patches(pathes_4th_quadrant, image_path, destination_device_dir_pathches_bottom_left)
 
-                    save_patches(pathes_1st_quadrant, image_path, destination_device_dir_pathches_top_rigth)
-                    save_patches(pathes_2nd_quadrant, image_path, destination_device_dir_pathches_bottom_rigth)
-                    save_patches(pathes_3rd_quadrant, image_path, destination_device_dir_pathches_top_left)
-                    save_patches(pathes_4th_quadrant, image_path, destination_device_dir_pathches_bottom_left)
-
-            device_num_patches_dict_top_rigth[device.name] = num_patches_top_right
-            device_num_patches_dict_bottom_rigth[device.name] = num_patches_bottom_right
-            device_num_patches_dict_top_left[device.name] = num_patches_top_left
-            device_num_patches_dict_bottom_left[device.name] = num_patches_bottom_left
-            print(f"{device.name} | {num_patches_top_right} patches for 1st quadrant ({int(time.time() - t_start)} sec.)")
-            print(f"{device.name} | {num_patches_bottom_right} patches for 2nd quadrant ({int(time.time() - t_start)} sec.)")
-            print(f"{device.name} | {num_patches_top_left} patches for 3rd quadrant ({int(time.time() - t_start)} sec.)")
-            print(f"{device.name} | {num_patches_bottom_left} patches for 4th quadrant ({int(time.time() - t_start)} sec.)")
+        device_num_patches_dict_top_rigth[device.name] = num_patches_top_right
+        device_num_patches_dict_bottom_rigth[device.name] = num_patches_bottom_right
+        device_num_patches_dict_top_left[device.name] = num_patches_top_left
+        device_num_patches_dict_bottom_left[device.name] = num_patches_bottom_left
+        print(f"{device.name} | {num_patches_top_right} patches for 1st quadrant ({int(time.time() - t_start)} sec.)")
+        print(f"{device.name} | {num_patches_bottom_right} patches for 2nd quadrant ({int(time.time() - t_start)} sec.)")
+        print(f"{device.name} | {num_patches_top_left} patches for 3rd quadrant ({int(time.time() - t_start)} sec.)")
+        print(f"{device.name} | {num_patches_bottom_left} patches for 4th quadrant ({int(time.time() - t_start)} sec.)")
 
     return device_num_patches_dict_top_rigth, device_num_patches_dict_bottom_rigth, device_num_patches_dict_top_left, device_num_patches_dict_bottom_left
 
@@ -168,17 +169,20 @@ if __name__ == "__main__":
     test_train_dataset_folder = args.test_train_dataset_folder
     quadrants_output_folder = args.quadrants_output_folder
     test_train = args.test_train
-    input_frames_path = test_train_dataset_folder + "/" + test_train
-    images_per_device = Path(input_frames_path)
+    device_folders = [folder for folder in os.listdir(test_train_dataset_folder)]
+    print(device_folders)
+    for device_folder in device_folders:
+        input_frames_path = test_train_dataset_folder + "/" + device_folder + "/" + test_train
+        images_per_device = Path(input_frames_path)
 
-    quadrant_1_path = quadrants_output_folder + "/quadrant_1/" + test_train
-    quadrant_2_path = quadrants_output_folder + "/quadrant_2/" + test_train
-    quadrant_3_path = quadrants_output_folder + "/quadrant_3/" + test_train
-    quadrant_4_path = quadrants_output_folder + "/quadrant_4/" + test_train
-    patches_per_device_top_rigth = Path(quadrant_1_path)
-    patches_per_device_bottom_right = Path(quadrant_2_path)
-    patches_per_device_top_left = Path(quadrant_3_path)
-    patches_per_device_bottom_left = Path(quadrant_4_path)
+        quadrant_1_path = quadrants_output_folder + "/" + test_train + "/" + device_folder + "/quadrant_1"
+        quadrant_2_path = quadrants_output_folder + "/" + test_train + "/" + device_folder + "/quadrant_2"
+        quadrant_3_path = quadrants_output_folder + "/" + test_train + "/" + device_folder + "/quadrant_3"
+        quadrant_4_path = quadrants_output_folder + "/" + test_train + "/" + device_folder + "/quadrant_4"
+        patches_per_device_top_rigth = Path(quadrant_1_path)
+        patches_per_device_bottom_right = Path(quadrant_2_path)
+        patches_per_device_top_left = Path(quadrant_3_path)
+        patches_per_device_bottom_left = Path(quadrant_4_path)
 
 
-    device_patch_dict_1st_quadrant, device_patch_dict_2nd_quadrant, device_patch_dict_3rd_quadrant, device_patch_dict_4th_quadrant = main(images_per_device, patches_per_device_top_rigth, patches_per_device_bottom_right, patches_per_device_top_left, patches_per_device_bottom_left)
+        device_patch_dict_1st_quadrant, device_patch_dict_2nd_quadrant, device_patch_dict_3rd_quadrant, device_patch_dict_4th_quadrant = main(images_per_device, patches_per_device_top_rigth, patches_per_device_bottom_right, patches_per_device_top_left, patches_per_device_bottom_left)
