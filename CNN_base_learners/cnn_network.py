@@ -6,7 +6,7 @@ from keras.callbacks import TensorBoard, Callback
 from keras import backend as K
 from keras.constraints import Constraint
 import numpy as np
-from CNN_branch_data_generator import DataGeneratorCNNBranch 
+from .CNN_branch_data_generator import DataGeneratorCNNBranch 
 
 class ConstrainedLayer(Constraint):
     def __call__(self, w):
