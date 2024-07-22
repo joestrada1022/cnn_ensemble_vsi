@@ -1,3 +1,5 @@
+#!/bin/bash
+
 python CNN_base_learners/train_CNN_branch.py --ds_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/data/patches --model_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/generated/patch_classifier/models --tensor_flow_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/generated/patch_classifier/logs --quadrant=quadrant_1
 python CNN_base_learners/train_CNN_branch.py --ds_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/data/patches --model_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/generated/patch_classifier/models --tensor_flow_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/generated/patch_classifier/logs --quadrant=quadrant_2
 python CNN_base_learners/train_CNN_branch.py --ds_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/data/patches --model_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/generated/patch_classifier/models --tensor_flow_path=/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/generated/patch_classifier/logs --quadrant=quadrant_3
