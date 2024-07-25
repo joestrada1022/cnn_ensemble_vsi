@@ -24,13 +24,13 @@ class EnsembleCNN:
         self.__check_model_path()
 
     def __check_model_path(self):
-        if not self.quadrant_1_model_path.endswith('.h5'):
+        if not self.quadrant_1_model_path.endswith('.keras' or '.h5') :
             raise ValueError('!!! Incorrect path to quadrant 1 model file !!!')
-        if not self.quadrant_2_model_path.endswith('.h5'):
+        if not self.quadrant_2_model_path.endswith('.keras' or '.h5'):
             raise ValueError('!!! Incorrect path to quadrant 2 model file !!!')
-        if not self.quadrant_3_model_path.endswith('.h5'):
+        if not self.quadrant_3_model_path.endswith('.keras' or '.h5'):
             raise ValueError('!!! Incorrect path to quadrant 3 model file !!!')
-        if not self.quadrant_4_model_path.endswith('.h5'):
+        if not self.quadrant_4_model_path.endswith('.keras' or '.h5'):
             raise ValueError('!!! Incorrect path to quadrant 4 model file !!!')
 
     def get_files_and_labels(self, test_dictionary):

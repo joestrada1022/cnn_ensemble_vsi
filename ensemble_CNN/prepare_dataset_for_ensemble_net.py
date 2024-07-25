@@ -8,12 +8,12 @@ class DataSetGeneratorForEnsembleModel:
     def __init__(self, input_dir_patchs=None, test_dir_suffix="", classes=None): 
         self.data_dir_patchs = pathlib.Path(input_dir_patchs)
 
-        self.train_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, "train"))
-        self.test_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, f"test{test_dir_suffix}"))
+        self.train_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, "Training"))
+        self.test_dir_patchs = pathlib.Path(os.path.join(self.data_dir_patchs, f"Testing{test_dir_suffix}"))
         
         self.device_types = np.array([item.name for item in self.train_dir_patchs.glob('*') if not item.name.startswith('.')])
-        self.train_image_count = len(list(self.train_dir_patchs.glob('*/*.jpg')))
-        self.test_image_count = len(list(self.test_dir_patchs.glob('*/*.jpg')))
+        self.train_image_count = len(list(self.train_dir_patchs.glob('**/*.jpg')))
+        self.test_image_count = len(list(self.test_dir_patchs.glob('**/*.jpg')))
 
         self.class_names = self.get_classes(classes)
         print(self.class_names)
@@ -69,15 +69,21 @@ class DataSetGeneratorForEnsembleModel:
             quadrant3_path = ""
             quadrant4_path = ""
             file_path, file_name = os.path.split(path)
-            device_name,_, video_name, frame_number, frame_path_sign, patch_number = file_name.split("-")
-            frame_number = frame_number + "-" + frame_path_sign
-            patch_number = frame_path_sign + "-" + patch_number
+            # 'iPhone-xsMax-2(143).MOV_014_P-number_001.jpg'
+            # ['iPhone', 'xsMax', '2(143).MOV_014_P', 'number_001.jpg']
+            device_name = file_name.split("-")[0]
+            patch_number = file_name.split("_")[-2] + '_' + file_name.split("_")[-1].split(".")[0]
+            video_name = file_name.split("_")[0].split("-")[-1]
+            frame_number = file_name.split("_")[1]
+            # device_name,_, video_name, frame_number, frame_path_sign, patch_number = file_name.split("-")
+            # frame_number = frame_number + "-" + frame_path_sign
+            # patch_number = frame_path_sign + "-" + patch_number
 
 
 
             classes = self.get_class_names()
             for device in classes:
-                if device in file_path:
+                if device.lower() in file_path.lower():
                     device_path_name = device
                     break
 
@@ -122,10 +128,10 @@ class DataSetGeneratorForEnsembleModel:
         return labeled_dictionary
 
     def create_test_ds_4_quadrants(self, train_path_ds_1, train_path_ds_2, train_path_ds_3, train_path_ds_4):
-        train_input_patches_file_names_quadrant1 = np.array(glob(str(os.path.join(train_path_ds_1, "test")) + "/**/*.jpg", recursive = True))
-        train_input_patches_file_names_quadrant2 = np.array(glob(str(os.path.join(train_path_ds_2, "test")) + "/**/*.jpg", recursive = True))
-        train_input_patches_file_names_quadrant3 = np.array(glob(str(os.path.join(train_path_ds_3, "test")) + "/**/*.jpg", recursive = True))
-        train_input_patches_file_names_quadrant4 = np.array(glob(str(os.path.join(train_path_ds_4, "test")) + "/**/*.jpg", recursive = True))
+        train_input_patches_file_names_quadrant1 = np.array(glob(str(os.path.join(train_path_ds_1, "Testing")) + "/**/quadrant_1/**/*.jpg", recursive = True))
+        train_input_patches_file_names_quadrant2 = np.array(glob(str(os.path.join(train_path_ds_2, "Testing")) + "/**/quadrant_2/**/*.jpg", recursive = True))
+        train_input_patches_file_names_quadrant3 = np.array(glob(str(os.path.join(train_path_ds_3, "Testing")) + "/**/quadrant_3/**/*.jpg", recursive = True))
+        train_input_patches_file_names_quadrant4 = np.array(glob(str(os.path.join(train_path_ds_4, "Testing")) + "/**/quadrant_4/**/*.jpg", recursive = True))
         labeled_dictionary = list()
         selected_pathches_by_quadrants = self.normalize_quadrants_selection_new(train_input_patches_file_names_quadrant1, train_input_patches_file_names_quadrant2, train_input_patches_file_names_quadrant3, train_input_patches_file_names_quadrant4)
         random.shuffle(selected_pathches_by_quadrants)

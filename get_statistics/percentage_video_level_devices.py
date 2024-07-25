@@ -29,16 +29,9 @@ if __name__ == "__main__":
         os.mkdir(files_path)
 
     DEVICE_TYPES = [
-        "Huawei-Y7Prime2019",
-        "Huawei-Y9",
-        "Iphone-8Plus",
-        "Nokia-5dot4",
         "Nokia-7dot1",
         "Samsung-A50",
-        "Samsung-Note9",
-        "Xiaomi-redmiNote8",
-        "Xioami-RedmiNote9Pro",
-        "iPhone-xsMax"
+        "iPhone-xsMax",
     ]
     previous_files = sorted(previous_files)
 

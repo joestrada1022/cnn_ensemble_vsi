@@ -38,30 +38,16 @@ if __name__ == "__main__":
             reader = csv.DictReader(csvfile)
 
             # 1. get videos names
-            VIDEO_DIR = "/Users/marynavek/Projects/files/Videos"
+            VIDEO_DIR = "/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/data/raw"
             DEVICES = [item for item in os.listdir(VIDEO_DIR) if os.path.isdir(os.path.join(VIDEO_DIR, item))]
 
             FILTERED_RESULTS = []
             
             newreader = []
             for row in reader:
+                # '/home/cslfiu/dev/cnn_vscf/NSF-REU-2024_VSCF/data/generated_patchesFool/Testing/IPhone/quadrant_1/iPhone-xsMax-2(14)/iPhone-xsMax-2(14).MOV_010_P-number_024.jpg'
                 file_name_row = row["File"]
-                # file_name_row = file_name_row.replace("['", "")
-                # file_name_row = file_name_row.replace("']", "")
-                # print(file_name_row)
-                remove_part, video_name3 = file_name_row.split("_vid_name")
-                video_name1 = video_name3.split(".")[0]
-                # print(video_name1)
-                video_name1 = video_name1.split("D")[1]
-                # print(video_name1)
-                patches_vide_name_arr = video_name1.split("_")
-
-                video_name = ""
-                # print(patches_vide_name_arr)
-                for d in range(len(patches_vide_name_arr)):
-                    if d != len(patches_vide_name_arr)-1:
-                        video_name += patches_vide_name_arr[d]
-                # print(video_name)
+                video_name = file_name_row.split("/")[-1].split(".")[0]
                 row["Video Name"] = video_name
                 newreader.append(row)
                 
